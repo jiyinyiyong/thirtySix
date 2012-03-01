@@ -11,9 +11,10 @@ sheng = [
 yun = [
   ['a',    'ia',   'ua'  ],
   ['o',    'io',   'uo'  ],
-  ['e',    'ie',   've'  ],
+  ['e',    'ie',   'ue'  ],
   ['',     'i',    'u'   ],
   ['ang',  'iang', 'uang'],
+  ['eng',  'ing',  'ueng'],
   ['ong',  'iong', ''    ],
   ['van',  'v',    'vn'  ],
   ['ai',   'er',   'uai' ],
@@ -101,9 +102,54 @@ translate = (tri) ->
   y_c = get_yun_column tri
   d_n = get_diao tri
   word = sheng[s_r][s_c] + yun[y_r][y_c] + diao[d_n]
+  word = word.replace /^0i/, 'y'
+  word = word.replace /^0u/, 'w'
+  word = word.replace /^0v/, 'yu'
+  word = word.replace /^0a/, 'a'
+  word = word.replace /^0e/, 'e'
+  word = word.replace /^0o/, 'o'
+  word = word.replace /gi/, 'ji'
+  word = word.replace /ki/, 'qi'
+  word = word.replace /hi/, 'xi'
+  word = word.replace /gv/, 'ju'
+  word = word.replace /kv/, 'qu'
+  word = word.replace /hv/, 'xu'
   return word
 
-for i in available[1..4]
-  for j in available[1..4]
-    for k in available[1..4]
-      console.log translate (i+j+k)
+# load file to compare (tri)s and (pinyin)s
+fs = require 'fs'
+fs.readFile 'mabiao.txt', 'utf8', (err, data) ->
+  # if err then throw err
+  lines = data.split '\n'
+  word = {}
+  for line in lines
+    match = line.match /^(\w+\d)=(.*)/
+    pinyin = match[1]
+    charactors = match[2]
+    # handle sth like "de5", change them into "de1"
+    if pinyin.match /5$/
+      pinyin_ = pinyin[0..-2]+'1'
+      if typeof word[pinyin_] isnt 'array'
+        word[pinyin_] = charactors.split ' '
+      else
+        for charactor in charactors
+          word[pinyin_] = word[pinyin_].push charactor
+    else
+      match = line.match /^(\w+\d)=(.*)/
+      pinyin = match[1]
+      charactors = match[2]
+      word[pinyin] = charactors.split ' '
+  # begin to filter (tri)s
+  text = ''
+  for i in available
+    for j in available
+      for k in available[1..]
+        tri = i+j+k
+        key = translate tri
+        if typeof word[key] isnt 'undefined'
+          line = "#{tri}:#{key}=#{word[key].join ' '}"
+          text += line + '\n'
+        else console.log key, ": ___________"
+  fs.writeFile 'new_mabiao.txt', text, (err) ->
+    if err then throw err
+    console.log 'done!'
