@@ -5,26 +5,26 @@ sheng = [
   ['d',  't',  'n',  'l'],
   ['g',  'k',  'h',  '0'],
   ['zh', 'ch', 'sh', 'r'],
-  ['z',  'c',  's',  '' ]
+  ['z',  'c',  's',  '_']
 ]
 # (yun 16, 3)
 yun = [
   ['a',    'ia',   'ua'  ],
   ['o',    'io',   'uo'  ],
-  ['e',    'ie',   'ue'  ],
-  ['',     'i',    'u'   ],
+  ['e',    'ie',   've'  ],
+  ['_',    'i',    'u'   ],
   ['ang',  'iang', 'uang'],
   ['eng',  'ing',  'ueng'],
-  ['ong',  'iong', ''    ],
+  ['ong',  'iong', '_'   ],
   ['van',  'v',    'vn'  ],
   ['ai',   'er',   'uai' ],
-  ['ao',   'iao',  ''    ],
-  ['ou',   'iu',   ''    ],
-  ['ei',   '',     'ui'  ],
+  ['ao',   'iao',  '_'   ],
+  ['ou',   'iu',   '_'   ],
+  ['ei',   '_',    'ui'  ],
   ['an',   'ian',  'uan' ],
-  ['',     '',     ''    ],
+  ['_',    '_',    '_'   ],
   ['en',   'in',   'un'  ],
-  ['',     '',     ''    ],
+  ['_',   '_',    '_'   ],
 ]
 diao = ['1', '2', '3', '4']
 
@@ -102,18 +102,30 @@ translate = (tri) ->
   y_c = get_yun_column tri
   d_n = get_diao tri
   word = sheng[s_r][s_c] + yun[y_r][y_c] + diao[d_n]
-  word = word.replace /^0i/, 'y'
-  word = word.replace /^0u/, 'w'
+  word = word.replace /^0u(\d)/, 'wu$1'
+  word = word.replace /^0i(\d)/, 'yi$1'
+  word = word.replace /^0ui(\d)/, 'wei$1'
+  word = word.replace /^0in/, 'yin'
+  word = word.replace /^0un/, 'wen'
+  word = word.replace /^0uen/, 'wen'
+  word = word.replace /^0ia/, 'ya'
+  word = word.replace /^0io/, 'yo'
+  word = word.replace /^0ie/, 'ye'
+  word = word.replace /^0iu/, 'you'
+  word = word.replace /^0ua/, 'wa'
+  word = word.replace /^0uo/, 'wo'
   word = word.replace /^0v/, 'yu'
   word = word.replace /^0a/, 'a'
   word = word.replace /^0e/, 'e'
   word = word.replace /^0o/, 'o'
-  word = word.replace /gi/, 'ji'
-  word = word.replace /ki/, 'qi'
-  word = word.replace /hi/, 'xi'
-  word = word.replace /gv/, 'ju'
-  word = word.replace /kv/, 'qu'
-  word = word.replace /hv/, 'xu'
+  word = word.replace /^gi/, 'ji'
+  word = word.replace /^ki/, 'qi'
+  word = word.replace /^hi/, 'xi'
+  word = word.replace /^gv/, 'ju'
+  word = word.replace /^kv/, 'qu'
+  word = word.replace /^hv/, 'xu'
+  word = word.replace /^ui/, 'wei'
+  word = word.replace /ve/, 'ue'
   return word
 
 # load file to compare (tri)s and (pinyin)s
@@ -141,6 +153,7 @@ fs.readFile 'mabiao.txt', 'utf8', (err, data) ->
       word[pinyin] = charactors.split ' '
   # begin to filter (tri)s
   text = ''
+  collection = {}
   for i in available
     for j in available
       for k in available[1..]
@@ -149,7 +162,13 @@ fs.readFile 'mabiao.txt', 'utf8', (err, data) ->
         if typeof word[key] isnt 'undefined'
           line = "#{tri}:#{key}=#{word[key].join ' '}"
           text += line + '\n'
-        else console.log key, ": ___________"
+          collection[key] = 'taken'
+        else
+          unless key.match /_/
+            console.log key, ' ::left'
+  for keyx, valuex of word
+    if typeof collection[keyx] is 'undefined'
+      console.log keyx
   fs.writeFile 'new_mabiao.txt', text, (err) ->
     if err then throw err
     console.log 'done!'
