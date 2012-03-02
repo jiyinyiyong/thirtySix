@@ -126,6 +126,8 @@ translate = (tri) ->
   word = word.replace /^hv/, 'xu'
   word = word.replace /^ui/, 'wei'
   word = word.replace /ve/, 'ue'
+  word = word.replace /([nl])ue/, '$1ve'
+  word = word.replace /^eng/, 'ng'
   return word
 
 # load file to compare (tri)s and (pinyin)s
@@ -167,8 +169,8 @@ fs.readFile 'mabiao.txt', 'utf8', (err, data) ->
           unless key.match /_/
             console.log key, ' ::left'
   for keyx, valuex of word
-    if typeof collection[keyx] is 'undefined'
-      console.log keyx
+    if typeof collection[keyx] isnt 'string'
+      console.log keyx, collection[keyx]
   fs.writeFile 'new_mabiao.txt', text, (err) ->
     if err then throw err
     console.log 'done!'
