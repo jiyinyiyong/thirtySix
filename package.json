@@ -1,0 +1,14 @@
+{
+  "name": "36input",
+  "subdomain": "36input",
+  "scripts": {
+    "start": "app.coffee"
+  },
+  "version": "0.0.1-3",
+  "dependencies": {
+    "express": "2.5.8",
+    "jade": "0.20.3",
+    "stylus": "0.24.0",
+    "socket.io": "0.9.0"
+  }
+}
