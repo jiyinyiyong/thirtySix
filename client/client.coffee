@@ -13,6 +13,7 @@ $ ->
   document.onkeypress = (e) ->
     # event here to send key to the server
     code = e.keyCode
+    if code is 0 then code = e.charCode
     console.log code
     press = String.fromCharCode code
     if press in available

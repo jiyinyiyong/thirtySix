@@ -8,5 +8,7 @@
   如果没字, 将显示 nothing
   有字的话直接显示出来, 太多了就隐藏, '-='两个键可以调出
   有字的话数字键可以将其选中
-Fedora 上 Chrome 测试勉强能运行, jitsu 有点慢
-Firefox Nightly 测试键盘事件不灵, 不知道为什么
+
+更多相关请见我这条微博 http://weibo.com/1651843872/y85GjA8lc
+应用部署在 http://36inpuy.nodejitsu.com/
+按下范围内字母键和数字键可以捕捉, 但码表目前很难用起来
